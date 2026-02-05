@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <iostream>
 #include "Seat.hpp"
-#include "Passenger.hpp"
+#include "Reservation.hpp"
 
 using namespace std;
 
@@ -61,10 +61,10 @@ class LinkedListSingly {
         }
 
         string getPassengerDetailsByNode(Node* nodePtr) {
-            if (!nodePtr || !nodePtr->seat.passenger) return "";
+            if (!nodePtr || !nodePtr->seat.reservation) return "";
             return
-                to_string(nodePtr->seat.passenger->passengerID) + " " +
-                nodePtr->seat.passenger->passengerName + "\n";
+                to_string(nodePtr->seat.reservation->passengerID) + " " +
+                nodePtr->seat.reservation->passengerName + "\n";
         }
 
     public:
@@ -84,22 +84,28 @@ class LinkedListSingly {
             }
         }
 
-        void reserveSeat(const int& seatRow, const char& seatColumn, const string& csvRecord) {
-            Node* nodePtr = getNodePtrByIndex(Seat::toRowIndex(seatRow), Seat::toColIndex(seatColumn));
-            Passenger* passenger = Passenger::getPassengerPtrByRecord(csvRecord);
-            nodePtr->seat.allocate(passenger);
+        void reserveSeat(const string& csvRecord) {
+            Reservation* reservation = Reservation::getReservation(csvRecord);
+            Node* nodePtr = getNodePtrByIndex(
+                Seat::toRowIndex(reservation->seatRow),
+                Seat::toColIndex(reservation->seatColumn)
+            );
+            nodePtr->seat.allocate(reservation);
         }
 
         void cancelSeat(const int& seatRow, const char& seatColumn) {
-            Node* nodePtr = getNodePtrByIndex(Seat::toRowIndex(seatRow), Seat::toColIndex(seatColumn));
+            Node* nodePtr = getNodePtrByIndex(
+                Seat::toRowIndex(seatRow), 
+                Seat::toColIndex(seatColumn)
+            );
             nodePtr->seat.deallocate();
         }
 
         string getPassengerDetailsByID(const int& passengerID) {
             Node* curr = head;
             while (curr) {
-                if (curr->seat.passenger &&
-                    curr->seat.passenger->passengerID == passengerID)
+                if (curr->seat.reservation &&
+                    curr->seat.reservation->passengerID == passengerID)
                     return getPassengerDetailsByNode(curr);
                 curr = curr->next;
             }
@@ -115,7 +121,7 @@ class LinkedListSingly {
             // Traverse until end of node with node index tracking
             for (int i=0; curr; i++, curr=curr->next) {
                 // Add to list if node on target row and has occupied seat 
-                if (i / colTotal == r && curr->seat.passenger)
+                if (i / colTotal == r && curr->seat.reservation)
                     passengerList += getPassengerDetailsByNode(curr);
             }
             cout << passengerList << endl;
@@ -128,7 +134,7 @@ class LinkedListSingly {
             // Traverse until end of node
             while (curr) {
                 // Add to list if node on target category and has occupied seat
-                if (curr->seat.category == category && curr->seat.passenger)
+                if (curr->seat.category == category && curr->seat.reservation)
                     passengerList += getPassengerDetailsByNode(curr);
                 curr = curr->next;
             }
@@ -149,7 +155,7 @@ class LinkedListSingly {
                 cout << (r + 1) << " ";
                 for (int c = 0; c < colTotal; c++) {
                     if (!curr) break;
-                    cout << (curr->seat.passenger ? "X" : "O") << " ";
+                    cout << (curr->seat.reservation ? "X" : "O") << " ";
                     curr = curr->next;
                 }
                 cout << endl;
@@ -159,11 +165,11 @@ class LinkedListSingly {
             cout << "\nOccupied Seats:\n";
             curr = head;
             while (curr) {
-                if (curr->seat.passenger) {
+                if (curr->seat.reservation) {
                     cout << "Row " << curr->seat.row 
                         << " Column " << curr->seat.column 
-                        << " -> ID: " << curr->seat.passenger->passengerID
-                        << ", Name: " << curr->seat.passenger->passengerName 
+                        << " -> ID: " << curr->seat.reservation->passengerID
+                        << ", Name: " << curr->seat.reservation->passengerName 
                         << endl;
                 }
                 curr = curr->next;
