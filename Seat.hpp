@@ -3,7 +3,7 @@
 
 #include <string>
 #include <stdexcept>
-#include "Passenger.hpp"
+#include "Reservation.hpp"
 
 
 
@@ -17,13 +17,13 @@ struct Seat {
         int row;
         char column;
         string category;
-        Passenger* passenger;
+        Reservation* reservation;
 
-        Seat() : row(1), column('A'), category("Economy"), passenger(nullptr) {}
+        Seat() : row(1), column('A'), category("Economy"), reservation(nullptr) {}
     
-        // Seat can have no passenger if not provided
-        Seat(int row, char column, Passenger* passenger = nullptr) :
-        row(row), column(column), passenger(passenger) {
+        // Seat can have no reservation if not provided
+        Seat(int row, char column, Reservation* reservation = nullptr) :
+        row(row), column(column), reservation(reservation) {
 
             // Safe instantiation from CSV record
             checkFields();
@@ -45,15 +45,17 @@ struct Seat {
             if (!isValidColumn) throw invalid_argument("Invalid seat column. Must be in between A to F.");
         }
 
-        void allocate(Passenger* passenger) {
-            if (this->passenger != nullptr)
+        void allocate(Reservation* reservation) {
+            if (this->reservation != nullptr)
                 throw logic_error("Failed to allocate seat. Seat already occupied.");
-            this->passenger = passenger;
+            this->reservation = reservation;
         }
 
         void deallocate() {
-            delete this->passenger;
-            this->passenger = nullptr;
+            if (!reservation)
+                throw logic_error("Seat already empty.");
+            delete reservation;
+            reservation = nullptr;
         }
 
         // Row Index / Seat Row conversion methods

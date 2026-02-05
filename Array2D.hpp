@@ -24,10 +24,10 @@ class Array2D {
         }
 
         string getPassengerDetailsByIndex(const int& r, const int& c) {
-            if (!seatGrid[r][c].passenger) return "";
+            if (!seatGrid[r][c].reservation) return "";
             return 
-                to_string(seatGrid[r][c].passenger->passengerID) + " " +
-                seatGrid[r][c].passenger->passengerName + "\n";
+                to_string(seatGrid[r][c].reservation->passengerID) + " " +
+                seatGrid[r][c].reservation->passengerName + "\n";
         }
 
     public:
@@ -53,8 +53,8 @@ class Array2D {
         string getPassengerDetailsByID(const int& passengerID) {
             for (int r=0; r<rowTotal; r++) {
                 for (int c=0; c<colTotal; c++) {
-                    if (!seatGrid[r][c].passenger) continue;
-                    if (seatGrid[r][c].passenger->passengerID == passengerID) {
+                    if (!seatGrid[r][c].reservation) continue;
+                    if (seatGrid[r][c].reservation->passengerID == passengerID) {
                         return getPassengerDetailsByIndex(r, c);
                     }
                 }
@@ -94,7 +94,7 @@ class Array2D {
                 cout.width(2);
                 cout << (r + 1) << " ";
                 for (int c = 0; c < colTotal; c++) {
-                    cout << (seatGrid[r][c].passenger ? "X" : "O") << " ";
+                    cout << (seatGrid[r][c].reservation ? "X" : "O") << " ";
                 }
                 cout << endl;
             }
@@ -103,11 +103,11 @@ class Array2D {
             cout << "\nOccupied Seats:\n";
             for (int r = 0; r < rowTotal; r++) {
                 for (int c = 0; c < colTotal; c++) {
-                    if (seatGrid[r][c].passenger) {
+                    if (seatGrid[r][c].reservation) {
                         cout << "Row " << seatGrid[r][c].row
                             << " Column " << seatGrid[r][c].column
-                            << " -> ID: " << seatGrid[r][c].passenger->passengerID
-                            << ", Name: " << seatGrid[r][c].passenger->passengerName
+                            << " -> ID: " << seatGrid[r][c].reservation->passengerID
+                            << ", Name: " << seatGrid[r][c].reservation->passengerName
                             << endl;
                     }
                 }
