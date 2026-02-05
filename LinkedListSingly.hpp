@@ -86,19 +86,36 @@ class LinkedListSingly {
 
         void reserveSeat(const string& csvRecord) {
             Reservation* reservation = Reservation::getReservation(csvRecord);
-            Node* nodePtr = getNodePtrByIndex(
-                Seat::toRowIndex(reservation->seatRow),
-                Seat::toColIndex(reservation->seatColumn)
-            );
-            nodePtr->seat.allocate(reservation);
+            int r = Seat::toRowIndex(reservation->seatRow);
+            int c = Seat::toColIndex(reservation->seatColumn);
+
+            Node* nodePtr = getNodePtrByIndex(r, c);
+            if (nodePtr->seat.reservation) {
+                nodePtr->seat.allocate(reservation);
+            } else {
+                throw invalid_argument("Failed to reserve seat. Seat occupied.");
+            }
         }
 
-        void cancelSeat(const int& seatRow, const char& seatColumn) {
+        void cancelSeat(const int& passengerID) {
+            Node* curr = head;
+            while (curr) {
+                if (curr->seat.reservation->passengerID == passengerID)
+                    curr->seat.deallocate();
+                    return;
+                curr = curr->next;
+            }
+            throw invalid_argument("No seat was reserved by passenger ID.");
+        }
+
+        int getPreviousPassengerID(const string& csvRecord) {
+            int seatRow = Reservation::getSeatRow(csvRecord);
+            char seatColumn = Reservation::getSeatColumn(csvRecord);
             Node* nodePtr = getNodePtrByIndex(
-                Seat::toRowIndex(seatRow), 
+                Seat::toRowIndex(seatRow),
                 Seat::toColIndex(seatColumn)
             );
-            nodePtr->seat.deallocate();
+            return nodePtr->seat.reservation->passengerID;
         }
 
         string getPassengerDetailsByID(const int& passengerID) {
@@ -111,7 +128,7 @@ class LinkedListSingly {
             }
             throw invalid_argument("No passenger details found with passenger ID.");
         }
-
+        
         void listPassengersBySeatRow(const int& seatRow) {
             int r = Seat::toRowIndex(seatRow);
             string passengerList = "";
