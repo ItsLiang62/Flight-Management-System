@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <iostream>
 #include "Seat.hpp"
-#include "Passenger.hpp"
+#include "Reservation.hpp"
 
 using namespace std;
 
@@ -24,7 +24,8 @@ class Array2D {
         }
 
         string getPassengerDetailsByIndex(const int& r, const int& c) {
-            if (!seatGrid[r][c].reservation) return "";
+            if (!seatGrid[r][c].reservation)
+                throw invalid_argument("No passenger details found with passenger ID.");
             return 
                 to_string(seatGrid[r][c].reservation->passengerID) + " " +
                 seatGrid[r][c].reservation->passengerName + "\n";
@@ -42,42 +43,75 @@ class Array2D {
             delete[] seatGrid;
         }
 
-        void reserveSeat(const int& seatRow, const char& seatColumn, const string& csvRecord) {
-            seatGrid[Seat::toRowIndex(seatRow)][Seat::toColIndex(seatColumn)].allocate(Passenger::getPassengerPtrByRecord(csvRecord));
+        void reserveSeat(const string& csvRecord) {
+            Reservation* reservation = Reservation::getReservation(csvRecord);
+            int r = Seat::toRowIndex(reservation->seatRow);
+            int c = Seat::toColIndex(reservation->seatColumn);
+            
+            if (seatGrid[r][c].reservation) {
+                seatGrid[r][c].allocate(reservation);
+            } else {
+                throw invalid_argument("Failed to reserve seat. Seat occupied.");
+            }
         }
 
-        void cancelSeat(const int& seatRow, const char& seatColumn) {
-            seatGrid[Seat::toRowIndex(seatRow)][Seat::toColIndex(seatColumn)].deallocate();
-        }
-
-        string getPassengerDetailsByID(const int& passengerID) {
+        void cancelSeat(const int& passengerID) {
             for (int r=0; r<rowTotal; r++) {
                 for (int c=0; c<colTotal; c++) {
-                    if (!seatGrid[r][c].reservation) continue;
-                    if (seatGrid[r][c].reservation->passengerID == passengerID) {
-                        return getPassengerDetailsByIndex(r, c);
-                    }
+                    if (seatGrid[r][c].reservation &&
+                        seatGrid[r][c].reservation->passengerID == passengerID)
+                        seatGrid[r][c].deallocate();
+                        return;
                 }
             }
-            throw invalid_argument("No passenger details found with passenger ID.");
+            throw invalid_argument("No seat was reserved by passenger ID.");
+        }
+
+        int getPreviousPassengerID(const string& csvRecord) {
+            int seatRow = Reservation::getSeatRow(csvRecord);
+            char seatColumn = Reservation::getSeatColumn(csvRecord);
+            for (int r=0; r<rowTotal; r++) {
+                for (int c=0; c<colTotal; c++) {
+                    if (seatGrid[r][c].reservation &&
+                        seatGrid[r][c].reservation->seatRow == seatRow &&
+                        seatGrid[r][c].reservation->seatColumn == seatColumn)
+                        return seatGrid[r][c].reservation->passengerID;
+                }
+            }
+        }
+
+        string getPassengerDetails(const int& passengerID) {
+            for (int r=0; r<rowTotal; r++) {
+                for (int c=0; c<colTotal; c++) {
+                    if (seatGrid[r][c].reservation &&
+                        seatGrid[r][c].reservation->passengerID == passengerID)
+                        return getPassengerDetailsByIndex(r, c);
+                }
+            }
         }
 
         void listPassengerBySeatRow(const int& seatRow) {
-            string passengerList = "";
+            string passengerManifest = "";
+            int r = Seat::toRowIndex(seatRow);
             for (int c=0; c<colTotal; c++) {
-                if (!getPassengerDetailsByIndex(Seat::toRowIndex(seatRow), c).empty()) 
-                    passengerList += getPassengerDetailsByIndex(Seat::toRowIndex(seatRow), c);
+                if (seatGrid[r][c].reservation) {
+                    string passengerDetails = getPassengerDetailsByIndex(
+                        Seat::toRowIndex(seatRow), c
+                    );
+                    passengerManifest += passengerDetails;
+                }
             }
-            cout << passengerList << endl;
+            cout << passengerManifest << endl;
         }
 
         void listPassengerByCategory(const string& category) {
             string passengerList = "";
             for (int r=0; r<rowTotal; r++) {
                 for (int c=0; c<colTotal; c++) {
-                    if (seatGrid[r][c].category == category) {
-                        if (!getPassengerDetailsByIndex(r, c).empty()) 
-                            passengerList += getPassengerDetailsByIndex(r, c);
+                    if (seatGrid[r][c].reservation &&
+                        seatGrid[r][c].category == category) {
+                        string passengerDetails = getPassengerDetailsByIndex(r, c);
+                        passengerList += passengerDetails;
                     }
                 }
             }
