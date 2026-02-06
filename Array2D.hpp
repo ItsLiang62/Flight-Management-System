@@ -51,6 +51,8 @@ class Array2D {
             if (!seatGrid[r][c].reservation) {
                 seatGrid[r][c].allocate(reservation);
             } else {
+                delete reservation;
+                reservation = nullptr;
                 throw invalid_argument("Failed to reserve seat. Seat occupied.");
             }
         }
