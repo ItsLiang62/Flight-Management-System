@@ -90,9 +90,11 @@ class LinkedListSingly {
             int c = Seat::toColIndex(reservation->seatColumn);
 
             Node* nodePtr = getNodePtrByIndex(r, c);
-            if (nodePtr->seat.reservation) {
+            if (!nodePtr->seat.reservation) {
                 nodePtr->seat.allocate(reservation);
             } else {
+                delete reservation;
+                reservation = nullptr;
                 throw invalid_argument("Failed to reserve seat. Seat occupied.");
             }
         }
@@ -100,7 +102,8 @@ class LinkedListSingly {
         void cancelSeat(const int& passengerID) {
             Node* curr = head;
             while (curr) {
-                if (curr->seat.reservation->passengerID == passengerID)
+                if (curr->seat.reservation &&
+                    curr->seat.reservation->passengerID == passengerID)
                     curr->seat.deallocate();
                     return;
                 curr = curr->next;
@@ -118,7 +121,7 @@ class LinkedListSingly {
             return nodePtr->seat.reservation->passengerID;
         }
 
-        string getPassengerDetailsByID(const int& passengerID) {
+        string getPassengerDetails(const int& passengerID) {
             Node* curr = head;
             while (curr) {
                 if (curr->seat.reservation &&

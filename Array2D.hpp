@@ -48,9 +48,11 @@ class Array2D {
             int r = Seat::toRowIndex(reservation->seatRow);
             int c = Seat::toColIndex(reservation->seatColumn);
             
-            if (seatGrid[r][c].reservation) {
+            if (!seatGrid[r][c].reservation) {
                 seatGrid[r][c].allocate(reservation);
             } else {
+                delete reservation;
+                reservation = nullptr;
                 throw invalid_argument("Failed to reserve seat. Seat occupied.");
             }
         }
@@ -78,6 +80,7 @@ class Array2D {
                         return seatGrid[r][c].reservation->passengerID;
                 }
             }
+            throw invalid_argument("No previous passenger found on the to be reserved seat.");
         }
 
         string getPassengerDetails(const int& passengerID) {
@@ -88,6 +91,7 @@ class Array2D {
                         return getPassengerDetailsByIndex(r, c);
                 }
             }
+            throw invalid_argument("No passenger details found with passenger ID.");
         }
 
         void listPassengerBySeatRow(const int& seatRow) {
@@ -136,7 +140,7 @@ class Array2D {
             // Print list of occupied seats
             cout << "\nOccupied Seats:\n";
             for (int r = 0; r < rowTotal; r++) {
-                for (int c = 0; c < colTotal; c++) {
+                for (int c = 0; c < colTotal;    c++) {
                     if (seatGrid[r][c].reservation) {
                         cout << "Row " << seatGrid[r][c].row
                             << " Column " << seatGrid[r][c].column
