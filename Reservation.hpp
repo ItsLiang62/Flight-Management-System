@@ -36,11 +36,30 @@ struct Reservation {
                 int passengerID = stoi(matches[1]);
                 string passengerName = matches[2];
                 int seatRow = stoi(matches[3]);
-                char seatColumn = stoi(matches[4]);
+                char seatColumn = matches[4].str()[0];
 
                 return new Reservation(passengerID, passengerName, seatRow, seatColumn);
             }
+            throw invalid_argument("Invalid CSV record format.");
         } 
+
+        static int getSeatRow(const string& csvRecord) {
+
+            Reservation* newReservation = getReservation(csvRecord);
+            int seatRow = newReservation->seatRow;
+            delete newReservation;
+            newReservation = nullptr;
+            return seatRow;
+        }
+
+        static char getSeatColumn(const string& csvRecord) {
+
+            Reservation* newReservation = getReservation(csvRecord);
+            int seatColumn = newReservation->seatColumn;
+            delete newReservation;
+            newReservation = nullptr;
+            return seatColumn;
+        }
 };
 
 #endif
