@@ -9,10 +9,6 @@ using namespace std;
 using namespace std::chrono;
 
 int main() {
-<<<<<<< Updated upstream
-    array2D.printSeatGrid();
-}
-=======
 
     Array2D array2D;
     LinkedListSingly linkedList;
@@ -86,7 +82,7 @@ int main() {
             int previousID = linkedList.getPreviousPassengerID(line);
 
             auto startGet = high_resolution_clock::now();
-            cout << linkedList.getPassengerDetailsByID(previousID);
+            cout << linkedList.getPassengerDetails(previousID);
             auto endGet = high_resolution_clock::now();
             getDetailTime += duration_cast<microseconds>(endGet - startGet).count();
 
@@ -110,4 +106,3 @@ int main() {
 
     return 0;
 }
->>>>>>> Stashed changes
