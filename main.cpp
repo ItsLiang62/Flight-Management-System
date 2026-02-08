@@ -35,7 +35,7 @@ int main() {
             int previousID = array2D.getPreviousPassengerID(line);
 
             auto startGet = high_resolution_clock::now();
-            cout << array2D.getPassengerDetails(previousID);
+            array2D.getPassengerDetails(previousID);
             auto endGet = high_resolution_clock::now();
             getDetailTime += duration_cast<microseconds>(endGet - startGet).count();
 
@@ -84,7 +84,7 @@ int main() {
             int previousID = linkedList.getPreviousPassengerID(line);
 
             auto startGet = high_resolution_clock::now();
-            cout << linkedList.getPassengerDetails(previousID);
+            linkedList.getPassengerDetails(previousID);
             auto endGet = high_resolution_clock::now();
             getDetailTime += duration_cast<microseconds>(endGet - startGet).count();
 

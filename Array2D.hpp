@@ -61,9 +61,10 @@ class Array2D {
             for (int r=0; r<rowTotal; r++) {
                 for (int c=0; c<colTotal; c++) {
                     if (seatGrid[r][c].reservation &&
-                        seatGrid[r][c].reservation->passengerID == passengerID)
-                        seatGrid[r][c].deallocate();
-                        return;
+                        seatGrid[r][c].reservation->passengerID == passengerID) {
+                            seatGrid[r][c].deallocate();
+                            return;
+                        }                  
                 }
             }
             throw invalid_argument("No seat was reserved by passenger ID.");
@@ -123,31 +124,15 @@ class Array2D {
         }
 
         void printSeatGrid() {
-            // Print column headers
-            cout << "   ";
-            for (char col : "ABCDEF") cout << col << " ";
-            cout << endl;
-
-            for (int r = 0; r < rowTotal; r++) {
-                cout.width(2);
-                cout << (r + 1) << " ";
-                for (int c = 0; c < colTotal; c++) {
-                    cout << (seatGrid[r][c].reservation ? "X" : "O") << " ";
-                }
-                cout << endl;
-            }
-
-            // Print list of occupied seats
             cout << "\nOccupied Seats:\n";
             for (int r = 0; r < rowTotal; r++) {
                 for (int c = 0; c < colTotal;    c++) {
+                    cout << seatGrid[r][c].row << seatGrid[r][c].column << ": ";
                     if (seatGrid[r][c].reservation) {
-                        cout << "Row " << seatGrid[r][c].row
-                            << " Column " << seatGrid[r][c].column
-                            << " -> ID: " << seatGrid[r][c].reservation->passengerID
-                            << ", Name: " << seatGrid[r][c].reservation->passengerName
-                            << endl;
+                        cout << seatGrid[r][c].reservation->passengerID
+                            << " " << seatGrid[r][c].reservation->passengerName;
                     }
+                    cout << endl;
                 }
             }
         }
