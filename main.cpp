@@ -19,6 +19,7 @@ int main() {
 
     ifstream file("flight_passenger_data.csv");
     string line;
+    getline(file, line);
 
     // ========= ARRAY VERSION =========
     while (getline(file, line)) {
@@ -30,30 +31,29 @@ int main() {
             reserveTime += duration_cast<microseconds>(end - start).count();
         }
         catch (invalid_argument&) {
+            try {
+            int previousID = array2D.getPreviousPassengerID(line);
 
-            int previousID;
-
-            // getPreviousPassengerID
-            previousID = array2D.getPreviousPassengerID(line);
-
-            // getPassengerDetails (just print)
             auto startGet = high_resolution_clock::now();
-            cout << array2D.getPassengerDetails(previousID);
+            array2D.getPassengerDetails(previousID);
             auto endGet = high_resolution_clock::now();
             getDetailTime += duration_cast<microseconds>(endGet - startGet).count();
 
-            // cancelSeat
             auto startCancel = high_resolution_clock::now();
             array2D.cancelSeat(previousID);
             auto endCancel = high_resolution_clock::now();
             cancelTime += duration_cast<microseconds>(endCancel - startCancel).count();
 
-            // reserve again
             auto startReserve = high_resolution_clock::now();
             array2D.reserveSeat(line);
             auto endReserve = high_resolution_clock::now();
             reserveTime += duration_cast<microseconds>(endReserve - startReserve).count();
         }
+         catch (invalid_argument&) {
+            // 什么都不用做，直接跳过这一行
+        }
+    }
+
     }
 
     cout << "\n=== ARRAY RESULT ===\n";
@@ -67,6 +67,8 @@ int main() {
     file.clear();
     file.seekg(0);
 
+    getline(file, line);
+
     reserveTime = cancelTime = getDetailTime = 0;
 
     while (getline(file, line)) {
@@ -78,11 +80,11 @@ int main() {
             reserveTime += duration_cast<microseconds>(end - start).count();
         }
         catch (invalid_argument&) {
-
+            try {
             int previousID = linkedList.getPreviousPassengerID(line);
 
             auto startGet = high_resolution_clock::now();
-            cout << linkedList.getPassengerDetails(previousID);
+            linkedList.getPassengerDetails(previousID);
             auto endGet = high_resolution_clock::now();
             getDetailTime += duration_cast<microseconds>(endGet - startGet).count();
 
@@ -96,6 +98,11 @@ int main() {
             auto endReserve = high_resolution_clock::now();
             reserveTime += duration_cast<microseconds>(endReserve - startReserve).count();
         }
+        catch (invalid_argument&) {
+            // skip
+        }
+    }
+
     }
 
     cout << "\n=== LINKED LIST RESULT ===\n";

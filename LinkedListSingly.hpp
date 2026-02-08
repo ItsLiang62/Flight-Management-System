@@ -103,9 +103,10 @@ class LinkedListSingly {
             Node* curr = head;
             while (curr) {
                 if (curr->seat.reservation &&
-                    curr->seat.reservation->passengerID == passengerID)
-                    curr->seat.deallocate();
-                    return;
+                    curr->seat.reservation->passengerID == passengerID) {
+                        curr->seat.deallocate();
+                        return;
+                    }           
                 curr = curr->next;
             }
             throw invalid_argument("No seat was reserved by passenger ID.");
@@ -163,35 +164,16 @@ class LinkedListSingly {
 
         void printSeatGrid() {
             if (!head) return;
-
-            // Print column headers
-            cout << "   ";
-            for (char col : "ABCDEF") cout << col << " ";
-            cout << endl;
-
             Node* curr = head;
-            for (int r = 0; r < rowTotal; r++) {
-                cout.width(2);
-                cout << (r + 1) << " ";
-                for (int c = 0; c < colTotal; c++) {
-                    if (!curr) break;
-                    cout << (curr->seat.reservation ? "X" : "O") << " ";
-                    curr = curr->next;
-                }
-                cout << endl;
-            }
 
-            // Print list of occupied seats
-            cout << "\nOccupied Seats:\n";
             curr = head;
             while (curr) {
+                cout << curr->seat.row  << curr->seat.column << ": ";
                 if (curr->seat.reservation) {
-                    cout << "Row " << curr->seat.row 
-                        << " Column " << curr->seat.column 
-                        << " -> ID: " << curr->seat.reservation->passengerID
-                        << ", Name: " << curr->seat.reservation->passengerName 
-                        << endl;
+                    cout << curr->seat.reservation->passengerID
+                        << " " << curr->seat.reservation->passengerName;
                 }
+                cout << endl;
                 curr = curr->next;
             }
         }
